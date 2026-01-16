@@ -2,31 +2,46 @@ import { useState } from "react";
 import Person from "./components/Note";
 
 const App = () => {
-  const [persons, setPersons] = useState([{ name: "Arto Hellas", id: 0 }]);
-  const [newName, setNewName] = useState("");
-  const addPhone = (event) => {
+  const [persons, setPersons] = useState([
+    { name: "Arto Hellas", id: 0, number: "0599999999" },
+  ]);
+  const [newPerson, setNewPerson] = useState({ name: "", number: "" });
+
+  const addPerson = (event) => {
     event.preventDefault();
-    const found = persons.find((person) => person.name === newName);
+    const found = persons.find((person) => person.name === newPerson.name);
     if (!found) {
       const newObject = {
-        name: newName,
+        name: newPerson.name,
+        number: newPerson.number,
         id: persons.length + 1,
       };
       setPersons(persons.concat(newObject));
-    } else alert(`${newName} is already added to phonebook`);
+    } else alert(`${newPerson.name} is already added to phonebook`);
+    setNewPerson({ name: "", number: "" });
   };
 
   const handlePhoneChange = (event) => {
-    event.preventDefault();
-    setNewName(event.target.value);
+    setNewPerson({
+      name: event.target.value,
+      number: newPerson.number,
+    });
+  };
+  const handleNumberChange = (event) => {
+    setNewPerson({ name: newPerson.name, number: event.target.value });
   };
   return (
     <div>
       <h2>Phonebook</h2>
-      <form onSubmit={addPhone}>
+      <form onSubmit={addPerson}>
         <div>
-          name: <input value={newName} onChange={handlePhoneChange} />
+          name: <input value={newPerson.name} onChange={handlePhoneChange} />
         </div>
+        <div>
+          number:{" "}
+          <input value={newPerson.number} onChange={handleNumberChange} />
+        </div>
+
         <div>
           <button type="submit">add</button>
         </div>
@@ -34,7 +49,7 @@ const App = () => {
       <h2>Numbers</h2>
       <div>
         {persons.map((person) => (
-          <Person key={person.id} note={person}></Person>
+          <Person key={person.id} content={person}></Person>
         ))}
       </div>
     </div>
