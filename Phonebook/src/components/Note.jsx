@@ -1,7 +1,7 @@
 const Note = ({ content }) => {
   return (
     <li>
-      {content.name} {content.number}{" "}
+      {content.name} {content.number}
     </li>
   );
 };

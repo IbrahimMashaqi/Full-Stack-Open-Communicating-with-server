@@ -1,6 +1,7 @@
 import { useState } from "react";
-import Person from "./components/Note";
-
+import Persons from "./components/Persons";
+import Filter from "./components/Filter";
+import PersonForm from "./components/PersonForm";
 const App = () => {
   const [persons, setPersons] = useState([
     { name: "Arto Hellas", id: 0, number: "0599999999" },
@@ -22,50 +23,32 @@ const App = () => {
     setNewPerson({ name: "", number: "" });
   };
 
-  const handlePhoneChange = (event) => {
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
     setNewPerson({
-      name: event.target.value,
-      number: newPerson.number,
+      ...newPerson,
+      [name]: value,
     });
   };
-  const handleNumberChange = (event) => {
-    setNewPerson({ name: newPerson.name, number: event.target.value });
-  };
-
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
   };
   const personsToShow = persons.filter(
     (person) =>
-      person.name.toLocaleLowerCase().includes(filter) ||
+      person.name.toLocaleLowerCase().includes(filter.toLocaleLowerCase()) ||
       person.number.includes(filter)
   );
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with{" "}
-        <input value={filter} onChange={handleFilterChange}></input>
-      </div>
-      <form onSubmit={addPerson}>
-        <div>
-          name: <input value={newPerson.name} onChange={handlePhoneChange} />
-        </div>
-        <div>
-          number:{" "}
-          <input value={newPerson.number} onChange={handleNumberChange} />
-        </div>
-
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <Filter filter={filter} handleFilterChange={handleFilterChange} />
+      <PersonForm
+        addPerson={addPerson}
+        handleInputChange={handleInputChange}
+        newPerson={newPerson}
+      />
       <h2>Numbers</h2>
-      <div>
-        {personsToShow.map((person) => (
-          <Person key={person.id} content={person}></Person>
-        ))}
-      </div>
+      <Persons persons={personsToShow} />
     </div>
   );
 };
