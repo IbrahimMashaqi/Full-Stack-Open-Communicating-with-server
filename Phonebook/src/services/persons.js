@@ -11,7 +11,7 @@ const addPerson = (person) => {
 const deletePerson = (id) => {
   return axios.delete(`${baseUrl}/${id}`);
 };
-const updatePerson = (person, id) => {
+const updatePerson = (id, person) => {
   return axios
     .put(`${baseUrl}/${id}`, person)
     .then((response) => response.data);
