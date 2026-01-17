@@ -1,30 +1,48 @@
+import { useState } from "react";
+
+const Country = ({ country }) => {
+  return (
+    <div>
+      <h1>{country.name.common}</h1>
+      <p>Capital {country.capital}</p>
+      <p>Area {country.area}</p>
+      <h1>Languages</h1>
+      <ul>
+        {Object.values(country.languages).map((language) => (
+          <li key={language}>{language}</li>
+        ))}
+      </ul>
+      <img src={country.flags.png} alt={country.flags.alt} />
+    </div>
+  );
+};
 const Countries = ({ countries }) => {
+  const [selectedCountry, setCountry] = useState(null);
   if (countries.length > 10) {
     return <p>Too many matches, specify another filter</p>;
   }
 
   if (countries.length === 1) {
     console.log(countries[0]);
-    const languages = Object.values(countries[0].languages);
-    return (
-      <div>
-        <h1>{countries[0].name.common}</h1>
-        <p>Capital {countries[0].capital}</p>
-        <p>Area {countries[0].area}</p>
-        <h1>Languages</h1>
-        <ul>
-          {languages.map((language) => (
-            <li key={language}>{language}</li>
-          ))}
-        </ul>
-        <img src={countries[0].flags.png} alt={countries[0].flags.alt} />
-      </div>
-    );
+    return <Country country={countries[0]} />;
   }
+
   return (
     <div>
       {countries.map((country) => (
-        <p key={country.cca3}>{country.name.common}</p>
+        <div key={country.name.common}>
+          <span>{country.name.common}</span>
+          <button
+            onClick={() => {
+              setCountry(country);
+            }}
+          >
+            show
+          </button>
+          {selectedCountry?.cca3 === country.cca3 && (
+            <Country country={country} />
+          )}
+        </div>
       ))}
     </div>
   );
