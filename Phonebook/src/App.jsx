@@ -4,9 +4,7 @@ import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import personService from "./services/persons";
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", id: 0, number: "0599999999" },
-  ]);
+  const [persons, setPersons] = useState([]);
   const [newPerson, setNewPerson] = useState({ name: "", number: "" });
   const [filter, setFilter] = useState("");
   useEffect(() => {
@@ -23,9 +21,15 @@ const App = () => {
       number: newPerson.number,
     };
     if (!person) {
-      personService.addPerson(newObject).then((data) => {
-        setPersons(persons.concat(data));
-      });
+      personService
+        .addPerson(newObject)
+        .then((data) => {
+          setPersons(persons.concat(data));
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("update person faild");
+        });
     } else if (
       !window.confirm(
         `${person.name} is already added to phonebook, replace the old number with a new one?`,
@@ -33,14 +37,22 @@ const App = () => {
     )
       return;
     else {
-      personService.updatePerson(newObject, person.id).then((data) => {
-        console.log(data);
-        setPersons(
-          persons.map((person) =>
-            person.id === data.id ? { ...person, number: data.number } : person,
-          ),
-        );
-      });
+      personService
+        .updatePerson(newObject, person.id)
+        .then((data) => {
+          console.log(data);
+          setPersons(
+            persons.map((person) =>
+              person.id === data.id
+                ? { ...person, number: data.number }
+                : person,
+            ),
+          );
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("update person faild");
+        });
     }
     setNewPerson({ name: "", number: "" });
   };
@@ -63,9 +75,15 @@ const App = () => {
   const handleDelete = (id) => {
     const person = persons.find((person) => person.id === id);
     if (!window.confirm(`Delete ${person.name} ?`)) return;
-    personService.deletePerson(id).then(() => {
-      setPersons(persons.filter((person) => person.id !== id));
-    });
+    personService
+      .deletePerson(id)
+      .then(() => {
+        setPersons(persons.filter((person) => person.id !== id));
+      })
+      .catch((error) => {
+        console.log(error);
+        alert("delete person faild");
+      });
   };
   return (
     <div>
