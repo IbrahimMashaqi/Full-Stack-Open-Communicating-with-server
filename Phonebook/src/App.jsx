@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Persons from "./components/Persons";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
+import axios from "axios";
 const App = () => {
   const [persons, setPersons] = useState([
     { name: "Arto Hellas", id: 0, number: "0599999999" },
@@ -9,6 +10,12 @@ const App = () => {
   const [newPerson, setNewPerson] = useState({ name: "", number: "" });
   const [filter, setFilter] = useState("");
 
+  useEffect(() => {
+    axios.get("http://localhost:3001/persons").then((response) => {
+      console.log(response);
+      setPersons(response.data);
+    });
+  }, []);
   const addPerson = (event) => {
     event.preventDefault();
     const found = persons.find((person) => person.name === newPerson.name);
@@ -36,7 +43,7 @@ const App = () => {
   const personsToShow = persons.filter(
     (person) =>
       person.name.toLocaleLowerCase().includes(filter.toLocaleLowerCase()) ||
-      person.number.includes(filter)
+      person.number.includes(filter),
   );
   return (
     <div>
