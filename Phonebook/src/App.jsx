@@ -3,6 +3,7 @@ import Persons from "./components/Persons";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import axios from "axios";
+const baseUrl = "http://localhost:3001/persons";
 const App = () => {
   const [persons, setPersons] = useState([
     { name: "Arto Hellas", id: 0, number: "0599999999" },
@@ -25,6 +26,9 @@ const App = () => {
         number: newPerson.number,
         id: persons.length + 1,
       };
+      axios.post(baseUrl, newObject).then((response) => {
+        setPersons(persons.concat(response.data));
+      });
       setPersons(persons.concat(newObject));
     } else alert(`${newPerson.name} is already added to phonebook`);
     setNewPerson({ name: "", number: "" });
