@@ -2,31 +2,46 @@ import { useState, useEffect } from "react";
 import Persons from "./components/Persons";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
-import axios from "axios";
+import personService from "./services/persons";
 const App = () => {
   const [persons, setPersons] = useState([
     { name: "Arto Hellas", id: 0, number: "0599999999" },
   ]);
   const [newPerson, setNewPerson] = useState({ name: "", number: "" });
   const [filter, setFilter] = useState("");
-
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      console.log(response);
-      setPersons(response.data);
+    personService.getPersons().then((data) => {
+      setPersons(data);
+      console.log(data);
     });
   }, []);
   const addPerson = (event) => {
     event.preventDefault();
-    const found = persons.find((person) => person.name === newPerson.name);
-    if (!found) {
-      const newObject = {
-        name: newPerson.name,
-        number: newPerson.number,
-        id: persons.length + 1,
-      };
-      setPersons(persons.concat(newObject));
-    } else alert(`${newPerson.name} is already added to phonebook`);
+    const person = persons.find((person) => person.name === newPerson.name);
+    const newObject = {
+      name: newPerson.name,
+      number: newPerson.number,
+    };
+    if (!person) {
+      personService.addPerson(newObject).then((data) => {
+        setPersons(persons.concat(data));
+      });
+    } else if (
+      !window.confirm(
+        `${person.name} is already added to phonebook, replace the old number with a new one?`,
+      )
+    )
+      return;
+    else {
+      personService.updatePerson(newObject, person.id).then((data) => {
+        console.log(data);
+        setPersons(
+          persons.map((person) =>
+            person.id === data.id ? { ...person, number: data.number } : person,
+          ),
+        );
+      });
+    }
     setNewPerson({ name: "", number: "" });
   };
 
@@ -45,6 +60,13 @@ const App = () => {
       person.name.toLocaleLowerCase().includes(filter.toLocaleLowerCase()) ||
       person.number.includes(filter),
   );
+  const handleDelete = (id) => {
+    const person = persons.find((person) => person.id === id);
+    if (!window.confirm(`Delete ${person.name} ?`)) return;
+    personService.deletePerson(id).then(() => {
+      setPersons(persons.filter((person) => person.id !== id));
+    });
+  };
   return (
     <div>
       <h2>Phonebook</h2>
@@ -55,7 +77,7 @@ const App = () => {
         newPerson={newPerson}
       />
       <h2>Numbers</h2>
-      <Persons persons={personsToShow} />
+      <Persons handleButton={handleDelete} persons={personsToShow} />
     </div>
   );
 };
